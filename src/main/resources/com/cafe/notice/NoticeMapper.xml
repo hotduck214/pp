@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cafe.notice.NoticeMapper">
+
+
+<select id="list"  parameterType="com.cafe.notice.NoticeVO" resultType="com.cafe.notice.NoticeVO">
+	SELECT * FROM notice
+		<where>
+			<if test="stype != null and sword !=''">
+				<if test="stype != 'all'">
+					${stype} LIKE '%${sword}%'
+				</if>
+				
+				<if test="stype == 'all'">
+					notice_title LIKE '%${sword}%' OR notice_content LIKE '%s{sword}%'
+				</if>
+			</if>
+		</where>
+		ORDER BY notice_regdate DESC
+		LIMIT ${startIdx}, ${pageRow};
+</select>
+
+<select id="count" parameterType="com.cafe.notice.NoticeVO" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM notice
+		<where>
+			<if test="stype != null and stype != ''">
+				<if test="stype != 'all'">
+					${stype} LIKE '%${sword}%'
+				</if>
+				<if test="stype == 'all'">
+		    		notice_title LIKE '%${sword}%' OR  notice_content LIKE '%${sword}%'
+		    	</if>
+		    </if>
+		</where>
+	</select>
+
+<insert id="insert" parameterType="com.cafe.notice.NoticeVO">
+	INSERT INTO notice(
+		admin_no, notice_title, notice_content, notice_viewcount, notice_regdate, filename_org, filename_real, notice_level
+		) VALUES (
+			admin_no, #{notice_title}, #{notice_content}, 0, NOW(), #{filename_org}, #{filename_real}, #{notice_level}
+		)
+</insert>
+		
+		
+<update id="update" parameterType="com.cafe.notice.NoticeVO">
+	UPDATE notice SET 
+		notice_title = #{notice_title}
+		, notice_content = #{notice_content}
+		<if test= "filename_org != null">
+		, filename_org = #{filename_org}
+		, filename_real = #{filename_real}
+		</if>
+	WHERE notice_no = #{notice_no}
+
+</update>
+
+<select id="view" parameterType="int" resultType="com.cafe.notice.NoticeVO">
+	SELECT * FROM notice WHERE notice_no = #{xxxx}
+</select>
+
+<update id="updateViewcount" parameterType="int">
+	UPDATE notice SET notice_viewcount = notice_viewcount+1 WHERE notice_no = #{notice_no}
+</update>
+
+
+<delete id="delete" parameterType = "int">
+	DELETE FROM notice WHERE notice_no = #{notice_no}
+</delete>
+
+		
+<!-- 
+
+stype이 null이 아니고 sword가 빈문자열이 아닌 것 중에서
+
+stype이 all이 아니면 ${stype} LIKE '%${sword}를 실행하고, 
+
+stype이 all이면 notice_title LIKE '%${sword}%' OR notice_content LIKE '%s{sword}%' 를 실행해라 -->	
+
+<!-- 
+					<c:forEach items = "${리스트가 받아올 배열이름}"
+					var = "for문 내부에서 사용할 변수"
+					varstatus = "상태용 변수"
+					</c:forEach>
+					 -->
+
+</mapper>

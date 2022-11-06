@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cafe.user.UserMapper">
+
+	<select id="list" parameterType="java.util.Map" resultType="com.cafe.user.UserVO">
+		SELECT user_no, user_name, user_id, user_email, user_nick, user_phone, user_regdate FROM user ORDER BY user_regdate DESC limit ${startIdx}, ${pageRow};
+	</select>
+	
+	<select id="view" resultType="com.cafe.user.UserVO" parameterType="com.cafe.user.UserVO">
+		SELECT * FROM user WHERE user_no = #{user_no} 
+	</select>
+	
+	<select id="detail" resultType="com.cafe.user.UserVO">
+		SELECT * FROM user WHERE user_no = #{user_no}
+	</select>
+	
+	<select id="myInfo" resultType="com.cafe.user.UserVO">
+		SELECT * FROM user WHERE user_id = #{user_id}
+	</select>
+
+	<insert id="insert" parameterType="com.cafe.user.UserVO">
+		INSERT INTO user (
+			user_nick, user_id, user_pwd, user_email, user_name, user_birthday, user_postcode, user_addr1, user_addr2, user_phone
+		) VALUES (
+			#{user_nick}, #{user_id}, #{user_pwd}, #{user_email}, #{user_name}, #{user_birthday}, #{user_postcode}, #{user_addr1}, #{user_addr2}, #{user_phone}
+		)
+	</insert>
+	
+	<delete id="delete" parameterType="int">
+		DELETE FROM user WHERE user_no=#{user_no }
+	</delete>
+	
+	<select id="count" parameterType="com.cafe.user.UserVO" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM user
+		
+		<where>
+			<if test="stype !=null and stype !='' ">
+				<if test="stype !='all' ">
+				${stype} LIKE '%${sword}%'
+			</if>
+			<if test="stype !='all' ">
+				title LIKE '%${sword}%' OR content LIKE '%${sword}%'
+			</if>
+			</if>				
+		</where>
+		ORDER BY user_regdate DESC
+		LIMIT ${startIdx}, ${pageRow};	
+	
+	</select>
+	
+	<select id="emailDupCheck" parameterType="string" resultType="int">
+		SELECT COUNT(*) FROM user WHERE user_id = #{user_id}
+	</select>
+	
+	<select id="nickDupCheck" parameterType="string" resultType="int">
+		SELECT COUNT(*) FROM user WHERE user_nick = #{user_nick}
+	</select>
+	
+	<select id="loginCheck" parameterType="com.cafe.user.UserVO" resultType="com.cafe.user.UserVO">
+		SELECT * FROM user WHERE user_id = #{user_id} AND user_pwd = #{user_pwd}
+	</select>
+	
+	<select id="findEmail" parameterType="com.cafe.user.UserVO" resultType="com.cafe.user.UserVO">
+		SELECT user_id FROM user WHERE user_name=#{user_name} AND user_phone=#{user_phone}  
+	</select>
+	
+	<select id="findPwd" parameterType="com.cafe.user.UserVO" resultType="com.cafe.user.UserVO">
+		SELECT * FROM user WHERE user_name=#{user_name} AND user_phone=#{user_phone} AND user_email=#{user_email}  
+	</select>
+	
+	<update id="updateTempPwd" parameterType="com.cafe.user.UserVO">
+		UPDATE user SET user_pwd = #{user_pwd} WHERE user_phone=#{user_phone} AND user_email = #{user_email}
+	</update>
+	
+	<update id="updateInfo" parameterType="com.cafe.user.UserVO">
+		UPDATE user SET user_pwd = #{user_pwd} WHERE user_id =#{user_id} AND user_birthday = #{user_birthday}
+	</update>
+	
+	<update id="edit" parameterType="com.cafe.user.UserVO">
+		UPDATE user SET user_pwd = #{user_pwd}, user_email = #{user_email}, user_name = #{user_name},
+			   user_postcode = #{user_postcode}, user_addr1 = #{user_addr1}, user_addr2 = #{user_addr2},
+			   user_phone = #{user_phone}
+		WHERE user_id =#{user_id} AND user_birthday = #{user_birthday}
+	</update>
+</mapper>

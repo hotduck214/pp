@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cafe.freecomment.FreeCommentMapper">
+	
+	<!-- parameterType 구문에 전달될 파라미터의 패키지 경로를 포함한 전체클래스명이나 별칭
+		 resultType 결과의 타입 -->
+	
+	<insert id="insert" parameterType="com.cafe.freecomment.FreeCommentVO">
+		INSERT INTO free_comment (
+			 free_no, comment_content, user_no, user_name, comment_regdate, tablename
+		) VALUES (
+			 #{free_no}, #{comment_content}, #{user_no}, #{user_name}, NOW(), #{tablename}
+		)
+	</insert>
+	
+	<select id="count" parameterType="com.cafe.freecomment.FreeCommentVO" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM free_comment WHERE free_no = #{free_no} AND tablename = #{tablename}
+	</select>
+	
+	
+	<select id="list" parameterType="com.cafe.freecomment.FreeCommentVO" resultType="com.cafe.freecomment.FreeCommentVO">
+ 		SELECT *, 
+		(SELECT user_name FROM user WHERE no = free_comment.user_no) AS user_name
+		FROM free_comment
+		
+		WHERE free_no = #{free_no} AND tablename = #{tablename}
+		ORDER by comment_regdate DESC
+		LIMIT #{startIdx}, #{pageRow};
+		
+	</select>
+	
+	<delete id="delete" parameterType="int">
+		DELETE FROM free_comment WHERE no=#{no}
+	</delete>
+	
+</mapper>
+	

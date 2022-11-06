@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cafe.free.FreeMapper">
+	
+	<!-- parameterType 구문에 전달될 파라미터의 패키지 경로를 포함한 전체클래스명이나 별칭
+		 resultType 결과의 타입 -->
+	
+	
+	
+	<select id="view" parameterType="int" resultType="com.cafe.free.FreeVO">
+		SELECT * FROM free WHERE free_no = #{xxxxx}
+	</select>
+	<!-- int 타입의 파라미터를 갖는다. -->
+	
+	<insert id="insert" parameterType="com.cafe.free.FreeVO">
+		INSERT INTO free (
+			free_title, free_content, free_viewcount, free_regdate, user_no, free_filenameorg, free_filenamereal 
+			) VALUES (
+			#{free_title}, #{free_content}, 0, NOW(), #{user_no},  #{free_filenameorg}, #{free_filenamereal} 
+			)
+	</insert>
+	
+	<select id="count" parameterType="com.cafe.free.FreeVO" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM free
+			<where>
+				<if test="stype != null and stype != ''">
+					<if test="stype != 'all'">
+						${stype} LIKE '%${sword}%'
+					</if>
+					<if test="stype == 'all'">
+					 	free_title LIKE '%${sword}%' OR free_content LIKE '%${sword}%'
+					</if>
+				</if>
+			</where>
+	</select>
+	<!--  parameterType="com.cafe.free.FreeVO" / resultType="java.lang.Integer" 결과데이터가 저장되는 곳. -->
+	
+	
+	<!-- 
+
+	stype이 null이 아니고 sword가 빈문자열이 아닌 것 중에서
+	
+	stype이 all이 아니면 ${stype} LIKE '%${sword}를 실행하고, 
+	
+	stype이 all이면 notice_title LIKE '%${sword}%' OR notice_content LIKE '%s{sword}%' 를 실행해라 
+	
+	-->	
+	
+	<!-- 
+					<c:forEach items = "${리스트가 받아올 배열이름}"
+					var = "for문 내부에서 사용할 변수"
+					varstatus = "상태용 변수"
+					</c:forEach>
+	-->
+	
+	
+	<select id="list" parameterType="com.cafe.free.FreeVO" resultType="com.cafe.free.FreeVO">
+		SELECT *,
+			(SELECT user_name FROM user WHERE user_no=free.user_no) AS user_name,
+			(SELECT COUNT(*) FROM free_comment WHERE free_no=free.free_no AND tablename = 'free') AS comment_count
+			FROM free
+		<where>
+			<if test="stype != null and stype != ''">
+				<if test="stype != 'all'">
+					${stype} LIKE '%${sword}%'
+				</if>
+				<if test="stype == 'all'">
+					 free_title LIKE '%${sword}%' OR free_content LIKE '%${sword}%'
+				</if>
+			</if>
+		</where>
+		ORDER BY free_regdate DESC
+		LIMIT ${startIdx}, ${pageRow};
+	</select>
+		<!-- SELECT *,
+		(SELECT user_nuck FROM user WHERE user_no=free.user_no) AS user_nick,
+		(SELECT COUNT(*) FROM free_conmment WHERE free_no=free.free_no AND tablename='free') AS comment_count
+		FROM free
+		<where>
+			<if test="stype != null and stype != ''">
+				<if test="stype != 'all'">
+					${stype} LIKE '%${sword}%'
+				</if>
+				<if test="stype == 'all'">
+					 free_title LIKE '%${sword}%' OR free_content LIKE '%${sword}%'
+				</if>
+			</if>
+		</where>
+		ORDER BY free_regdate DESC
+		LIMIT ${startIdx}, ${pageRow};
+	</select> -->
+	
+	<update id="update" parameterType="com.cafe.free.FreeVO">
+		UPDATE free SET
+			free_title = #{free_title}
+			, free_content = #{free_content}
+			<if test="free_filenameorg != null">
+			, free_filenameorg = #{free_filenameorg}
+			, free_filenamereal = #{free_filenamereal}
+			</if>
+			
+		WHERE free_no =  #{free_no}
+	
+	</update>
+	
+	<update id="updateViewcount" parameterType="int">
+		UPDATE free SET free_viewcount = free_viewcount+1 WHERE free_no = #{free_no}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		DELETE FROM free WHERE free_no=#{free_no}
+	</delete>
+	
+</mapper>
+	

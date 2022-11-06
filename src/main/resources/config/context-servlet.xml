@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+		
+		<!-- 2. SpringFrameWork의 동작원리
+		
+		index.jsp에서 프로젝트를 run 실행시키면 404에러가 날 수 밖에 없다.
+		index.jsp가 위치한 WEB_INF 폴더는 설정 파일을 담고 있는 중요한 폴더이기 때문에 
+		외부에서의 직접적인 접근을 막고 있기 때문이다.
+		
+		그렇다면 어떤 방식으로 index.jsp파일을 실행 시킬 수 있을까?
+		
+		이를 이해하기 위해서는 SpringFrameWork의 동작원리를 이해하여야한다.
+		
+		먼저 클라이언트로부터 요청(request)가 들어오면, 제일 먼저 web.xml이 실행된다.
+		이후 servelet-context.xml
+		-> IndexController -> servelet-context.xml
+		-> index.jsp
+		-> web.xml 순으로
+		
+		
+		DispatcherServelet이 요청을 가로채고 servelet-context.xml을 실행시킨다.
+		
+		web.xml에서는 요청에 대해 가장 먼저 처리를 시작한다.
+		여기서는 DispatcherServlet을 주목해야하는데, 
+		
+		web.xml에서 다른 처리로 넘어가기 전에
+		이 DispatcherServelet이 <url-pattern>의 형태로 들어오는 요청을 가로채어 servelet-context.xml로 넘겨버린다.
+		 
+		
+		servelet-context.xml 에서는 
+		<annotation-drive> 와 <context:component-scan.../>에 주목하여야한다.
+		
+		먼저
+		<context:component-scan.../>에서는 해당 위치의 어노테이션을 읽어들여서
+		bean으로 등록한다,
+		
+		<annotation-drive>은 HandelerMapping & HandlerAdapter의 역할로써, 
+		component-scan을 통해서 스캔된 bean 중에서 
+		해당 요청과 알맞은 Controller을 찾아 연결시켜준다.
+		
+		다음으로 요청을 처리할 곳은 IndexController이다.
+		HandlerMapping을 통하여 요청에 맞는 컨트롤러인 IndexController로 이동하게 되면
+		
+		
+		servelet-context.xml 의 component-scan에 의해서 IndexController의 @Controller이 읽혀
+		bean으로 등록되었고, annotation-driven은 @RequestMapping을 읽어들이면서
+		해당 요청(/)을 처리할 수 있는 Controller를 찾아냈다.
+		
+		이렇게 함으로써 IndexController가 요청을 받을 수 있게 된다.
+		
+		요청을 받은 Controller는 적당한 처리를 취한 뒤,
+		Model.addAttribute()를 통하여 처리완료된 데이터를 Model에 다시 담고, 
+		"~"이라는 이름으로 return 한다.
+		
+		
+		Model과 Controller를 거쳤으니, 이제 View를 거칠 차례이다.
+		
+		다시 돌아온 servelet-context.xml에서는 Controller에서 반환된 "~"를 가지고 View로 접근할 수 있는
+		경로를 만든다.
+		
+		이 과정을 거치면 /WEB-INT/view/~.jsp라는 경로가 최종적으로 만들어지게 되고
+		InternalResourceViewResolver를 통하여 이에 맞는 View를 찾는다.
+		
+		이것이 다시 web.xml의 DispatcherServelet으로 넘어가게 되면서
+		우리가 ~.jsp를 브라우저 상에서 볼 수 있게 된다.
+		
+	 -->
+		
+		
+		
+		
+
+	<!-- 만약 component-scan을 사용하지 않으면, 빈으로 설정할 클래스들을 직접 xml파일에 일일이 등록해주어야하는 번거로움이 발생한다. -->
+	<context:component-scan base-package="com.cafe" />
+	
+	<mvc:annotation-driven/> <!-- annotation 활성화 -->
+ 	<mvc:default-servlet-handler/>
+ 	
+ 	<mvc:resources mapping="/resources/**" location="/resources/" />
+	<mvc:resources mapping="/webapp/css/**" location="/webapp/css/" />
+	<mvc:resources mapping="/webapp/js/**" location="/webapp/js/" />
+	<mvc:resources mapping="/webapp/img/**" location="/webapp/img/" />
+ 	
+ 	<mvc:view-resolvers>
+ 	    <mvc:jsp prefix="/WEB-INF/view/"/>
+ 	    <mvc:jsp suffix="jsp"/>
+ 	</mvc:view-resolvers>
+ 	
+ 	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
+		<property name="jdbcUrl" value="jdbc:log4jdbc:mysql://localhost:3306/project"></property>
+		<property name="username" value="testuser"/> 
+ 		<property name="password" value="testuser"/> 
+	</bean>
+	
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+		<constructor-arg ref="hikariConfig"></constructor-arg>
+	</bean>
+		
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<!-- 등록된 Mapper를 사용하기 위해서는 보통 아래와 같이 Mapper를 스캔할 수 있게 추가 설정 -->
+	<mybatis-spring:scan base-package="com.cafe" annotation="org.apache.ibatis.annotations.Mapper" />
+	
+	<!-- 파일업로드 -->
+ 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="utf-8"/>
+		<property name="maxUploadSize" value="10000000"/>	
+	</bean>
+	
+	<!-- MapperFactoryBean설정해줘야하는 경우 (bean 설정파일에) - 예시일뿐임, 참고만
+	
+	<bean id = "userMapper" class="org.mabatis.spring.mapperFactoryBean">
+		<property name = "mapperInterface" value="myspring/user.dao.UserMapper" />
+		<property name = "sqlSessionTemplate" ref="sqlSession" />
+	</bean>
+	
+	MapperFactoryBean은 sqlSessionFactory 나 sqlSessionTemplate을 필요로 한다.
+	프록시는 런타임에 생성되기 때문에 지정된 Mapper는 실제 구현 클래스가 아닌, 인터페이스여야만 한다.
+		
+		
+	
+	
+	-->
+	
+ 	<!-- 사용자 정적페이지 annotation-driven 세텅해야함 -->
+	<mvc:view-controller path="/portfolio/notice/index.do"/>
+	<mvc:view-controller path="/portfolio/notice/view.do"/>
+	<mvc:view-controller path="/portfolio/notice/write.do"/>
+	<mvc:view-controller path="/portfolio/notice/edit.do"/>
+	
+	<mvc:view-controller path="/portfolio/reply/index.do"/>
+	<mvc:view-controller path="/portfolio/reply/view.do"/>
+	<mvc:view-controller path="/portfolio/reply/write.do"/>
+	<mvc:view-controller path="/portfolio/reply/edit.do"/>
+	
+	
+	
+	<mvc:interceptors>
+		<mvc:interceptor>
+		<!--  	<mvc:mapping path="/board/write.do"/>
+			<mvc:mapping path="/board/insert.do"/>
+			<mvc:mapping path="/board/edit.do"/>
+			<mvc:mapping path="/board/update.do"/>
+			<mvc:mapping path="/board/delete.do"/>
+			-->
+			
+			<mvc:mapping path="/notice/**/"/>
+			<mvc:exclude-mapping path="/notice/index.do"/>
+			<mvc:exclude-mapping path="/notice/view.do"/>
+			
+			
+			<bean class="interceptor.UserLoginInterceptor"></bean> 		
+		</mvc:interceptor>
+	</mvc:interceptors>
+</beans>

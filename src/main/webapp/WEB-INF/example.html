@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+<!--//
+<!-- c:out 변수의 값을 출력해준다.
+		c:out value="작성자" default="Admin" />
+		value가 null일 경우 설정한 default값 출력
+		
+		c:set 변수의 값을 저장한다. setAttribute와 동일한 역할을 한다.
+		c:set var="변수명" value="00000" "/>
+		
+		c:forEach
+		범위 안에서 반목문을 수행한다. for와 동일한 역할을 한다.
+		begin:시작값, end:마지막 값, step:증가 단위
+		c:forEach var="i" begin="1" end="10" step="1">
+			c:set var="Num" value="반복문">
+		</c:forEach>
+		i라는 변수를 사용하여 1부터 10까지 증가하면 반복문을 수행한다.
+		
+		if esle 구문 역할
+		<c:choose>
+			<c:when test="${page eq '1'}>
+				page값이 1일때 해당되는 블록
+			</c:when>
+			<c:when test="${page eq '0'}>
+				page값이 0일때 해당되는 블록
+			</c:when>
+		
+			<c:otherwise>
+				page 값이 1도아니고 0도 아닐때 해당되는 블록
+			</c:otherwise>
+		</c:choose>
+		
+		
+		 -->
+
+
+
+<!-- function 함수명()
+	 자바스크립트 코드;
+	 
+	 --
+	 매개변수가 있는 함수 정의문
+	 기본 함수 정의문은 함수 안에 있는 코드를 실행할 때 단순히 함수명으로 호출해서
+	 코드를 실행하는 반면
+	 
+	 매개변수가 있는 함수 정의문은
+	 함수를 호출할 때 전달하고자 하는 값을 입력하여 호출할 수 있다.
+	 
+	 이와같이 전달된 값은 매개변수가 받아 함수 정의문에서 사용할 수 있다.
+	 
+	 function 함수명(매개변수1, 매개변수2){
+		 
+		 자바스크립트 코드;
+	 }
+	 함수명(데이터 1, 데이터 2)
+	 
+	 데이터1은 매개변수 1에 저장되는 식이다.
+--
+즉시 실행 함수 (함수 선언과 동시에 함수를 호출할 수 있다.)
+	 
+	 (functio(){
+		 자바스크립트 코드;
+	 }());
+	 
+	
+		<!-- if test="${loginUserInfo.user_no == vo.user_no }" -->
+	 
+
+
+<!-- 
+	Ajax 관련 메서드
+	Ajax는 클라이언트(방문자 컴퓨터)가 비동기 방식으로 자바스크립트를 이용,
+	화면 전환 없이 서버(서비스 제공 컴퓨터) 측에 자료(XML, HTML, JSON 등)을 요청할때
+	사용한다.
+	
+	메서드 종류
+	$.ajax()
+	데이터를 서버에 HTTP POST, GET 방식으로 전송할 수 있고
+	XML, HTML, JSON 등에 데이터를 요청할 수 있는 통합적인 메서드이다. 
+	(각 방식으로 전송한 후 서버측의 응답을 받을 때 사용)
+	
+	
+	Ajax로 Json데이터를 바인딩 하기
+	
+function getComment(page) {
+	$.ajax({
+		url : "/pp/portfolio/freecomment/list.do", // url 전송 페이지
+		data : {								// 전송할 데이터
+			free_no : ${data.free_no},		
+			tablename : 'free',
+			page : page
+		},
+		success : function(res) {			
+			$("#commentArea").html(res);	// 전송에 성공하면 실행될 코드
+	   <!-- $("#commentArea") 이와 같이 선택한 요소의 하위요소를 모두 제거하고
+	   		.html(res) 그 위치에 res라는 새요소를 생성한다.
+	   		res?
+			
+			
+		}
+	});
+}
+
+
+		<c:if test="${loginUserInfo.user_no == vo.user_no }">
+
+-->
+</body>
+</html>
